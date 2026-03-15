@@ -11,7 +11,6 @@ import BASE_URL from '../../config';
 
 const { width } = Dimensions.get('window');
 
-
 export default function HomeScreen() {
   const router = useRouter();
   const [offlineBalance, setOfflineBalance] = useState(0);
@@ -44,7 +43,6 @@ export default function HomeScreen() {
             }
           } catch (_) {}
 
-          // Auto-settle pending transactions
           const count = await getPendingCount();
           setPendingCount(count);
           if (count > 0) {
@@ -54,7 +52,6 @@ export default function HomeScreen() {
               if (result.settled > 0) {
                 setSettleResult(`✅ ${result.settled} transaction${result.settled > 1 ? 's' : ''} settled to cloud!`);
                 setPendingCount(result.failed);
-                // Refresh cloud balance after settlement
                 const res2 = await fetch(`${BASE_URL}/api/users/${id}/balance`);
                 if (res2.ok) setCloudBalance(await res2.json() ?? 0);
                 setTimeout(() => setSettleResult(null), 4000);
@@ -95,9 +92,11 @@ export default function HomeScreen() {
 
   const quickActions = [
     { icon: 'qr-code-outline', label: 'Pay QR', route: '/send-qr' },
-    { icon: 'scan-outline', label: 'Receive', route: '/receive-qr' },
+    { icon: 'scan-outline', label: 'Recv QR', route: '/receive-qr' },
     { icon: 'bluetooth-outline', label: 'BLE Pay', route: '/send-ble' },
     { icon: 'radio-outline', label: 'BLE Recv', route: '/receive-ble' },
+    { icon: 'wifi-outline', label: 'NFC Pay', route: '/send-nfc' },
+    { icon: 'wifi-outline', label: 'NFC Recv', route: '/receive-nfc' },
   ];
 
   return (
@@ -112,7 +111,6 @@ export default function HomeScreen() {
             <Text style={styles.userName}>{userName || 'User'} 👋</Text>
           </View>
           <View style={styles.headerRight}>
-            {/* ✅ Register badge — shows only when not registered */}
             {!userId && (
               <TouchableOpacity
                 style={styles.registerBadge}
@@ -132,37 +130,36 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Floating Balance Card — outside header */}
+      {/* Floating Balance Card */}
       <View style={styles.balanceCard}>
-          <View style={styles.balanceRow}>
-            <View style={styles.balanceBlock}>
-              <Text style={styles.balLabel}>Offline Vault</Text>
-              <Text style={styles.balAmount}>
-                {balanceHidden ? '₹ ••••' : `₹ ${offlineBalance.toFixed(2)}`}
-              </Text>
-            </View>
-            <View style={styles.balDivider} />
-            <View style={styles.balanceBlock}>
-              <Text style={styles.balLabel}>Cloud Balance</Text>
-              <Text style={styles.balAmount}>
-                {balanceHidden ? '₹ ••••' : `₹ ${cloudBalance.toFixed(2)}`}
-              </Text>
-            </View>
-            <TouchableOpacity onPress={() => setBalanceHidden(v => !v)} style={{ padding: 4 }}>
-              <Ionicons name={balanceHidden ? 'eye-outline' : 'eye-off-outline'} size={18} color="#5f6368" />
-            </TouchableOpacity>
-          </View>
-
-          {/* ✅ Load button with register check */}
-          <TouchableOpacity style={styles.loadBtn} onPress={handleLoadWallet}>
-            <Ionicons name="add-circle-outline" size={18} color="#1a73e8" style={{ marginRight: 6 }} />
-            <Text style={styles.loadBtnText}>
-              {userId ? 'Load Offline Wallet' : 'Register to Load Wallet'}
+        <View style={styles.balanceRow}>
+          <View style={styles.balanceBlock}>
+            <Text style={styles.balLabel}>Offline Vault</Text>
+            <Text style={styles.balAmount}>
+              {balanceHidden ? '₹ ••••' : `₹ ${offlineBalance.toFixed(2)}`}
             </Text>
+          </View>
+          <View style={styles.balDivider} />
+          <View style={styles.balanceBlock}>
+            <Text style={styles.balLabel}>Cloud Balance</Text>
+            <Text style={styles.balAmount}>
+              {balanceHidden ? '₹ ••••' : `₹ ${cloudBalance.toFixed(2)}`}
+            </Text>
+          </View>
+          <TouchableOpacity onPress={() => setBalanceHidden(v => !v)} style={{ padding: 4 }}>
+            <Ionicons name={balanceHidden ? 'eye-outline' : 'eye-off-outline'} size={18} color="#5f6368" />
           </TouchableOpacity>
+        </View>
+        <TouchableOpacity style={styles.loadBtn} onPress={handleLoadWallet}>
+          <Ionicons name="add-circle-outline" size={18} color="#1a73e8" style={{ marginRight: 6 }} />
+          <Text style={styles.loadBtnText}>
+            {userId ? 'Load Offline Wallet' : 'Register to Load Wallet'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.body} showsVerticalScrollIndicator={false}>
+
         {/* Quick Actions */}
         <Text style={styles.sectionTitle}>Quick Actions</Text>
         <View style={styles.quickActions}>
@@ -182,10 +179,10 @@ export default function HomeScreen() {
         {/* Security Badge */}
         <View style={styles.secBadge}>
           <Ionicons name="shield-checkmark" size={18} color="#1a73e8" />
-          <Text style={styles.secText}>RSA-256 signed · JWT secured · Offline ready</Text>
+          <Text style={styles.secText}>RSA-256 signed · JWT secured · NFC · BLE · QR</Text>
         </View>
 
-        {/* Settlement Banner */}
+        {/* Settlement Banners */}
         {settleResult && (
           <View style={styles.settleBanner}>
             <Ionicons name="cloud-done-outline" size={18} color="#16a34a" />
@@ -252,7 +249,7 @@ export default function HomeScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.txTitle}>
-                  {item.type === 'send' ? 'Sent' : item.type === 'load' ? 'Loaded' : 'Received'}
+                  {item.type === 'send' ? `Sent${item.via ? ' via ' + item.via : ''}` : item.type === 'load' ? 'Loaded' : `Received${item.via ? ' via ' + item.via : ''}`}
                 </Text>
                 <Text style={styles.txDate}>{item.date}</Text>
               </View>
@@ -263,11 +260,11 @@ export default function HomeScreen() {
           ))
         )}
 
-        {/* Reset button */}
+        {/* Logout button */}
         <TouchableOpacity style={styles.resetBtn} onPress={() => {
           Alert.alert(
             '⚠️ Log Out',
-            'This will log you out of this device. Your cloud balance and history are safe on the server — just log back in!',
+            'This will log you out of this device. Your cloud balance is safe!',
             [
               { text: 'Cancel', style: 'cancel' },
               { text: 'Log Out', style: 'destructive', onPress: async () => {
@@ -307,8 +304,8 @@ const styles = StyleSheet.create({
   loadBtnText: { color: '#1a73e8', fontWeight: '700', fontSize: 14 },
   body: { flex: 1, paddingHorizontal: 20, paddingTop: 20 },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: '#202124', marginBottom: 14 },
-  quickActions: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
-  actionBtn: { alignItems: 'center', width: (width - 60) / 4 },
+  quickActions: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 20 },
+  actionBtn: { alignItems: 'center', width: (width - 60) / 3, marginBottom: 16 },
   actionIcon: { width: 58, height: 58, borderRadius: 16, backgroundColor: '#e8f0fe', alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
   actionLabel: { fontSize: 11, color: '#3c4043', fontWeight: '600', textAlign: 'center' },
   secBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#e8f0fe', borderRadius: 12, padding: 12, marginBottom: 12, gap: 8 },

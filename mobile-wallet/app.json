@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile-wallet",
-    "slug": "mobile-wallet",
+    "name": "Offline UPI",
+    "slug": "offline-upi",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,7 +9,12 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NFCReaderUsageDescription": "Used to send and receive payments via NFC tap",
+        "NSBluetoothAlwaysUsageDescription": "Used to send and receive payments via Bluetooth",
+        "NSBluetoothPeripheralUsageDescription": "Used to send and receive payments via Bluetooth"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +24,18 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.atharvakalhatkar.offlineupi",
+      "permissions": [
+        "android.permission.NFC",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.BLUETOOTH_ADVERTISE",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "output": "static",
@@ -27,6 +43,7 @@
     },
     "plugins": [
       "expo-router",
+      "react-native-nfc-manager",
       [
         "expo-splash-screen",
         {
@@ -43,6 +60,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "03913a6a-574b-40d1-93cd-9161901b50c1"
+      }
+    },
+    "owner": "atharvakalhatkar"
   }
 }

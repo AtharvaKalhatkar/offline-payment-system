@@ -8,8 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useRef } from 'react';
+import BASE_URL from '../config';
 
-const BASE_URL = 'http://10.77.98.11:8082'; // ✅ ngrok
 
 export default function LoginScreen() {
   const router = useRouter();
