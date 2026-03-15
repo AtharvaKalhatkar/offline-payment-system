@@ -1,4 +1,4 @@
-# 💸 Offline UPI Payment System
+#  Offline UPI Payment System
 **A Full-Stack Decentralized Payment Solution for Offline Environments**
 
 This project demonstrates a secure way to perform UPI-style transactions without an active internet connection. It uses a **Spring Boot** backend for secure JWT signing and a **React Native** mobile frontend for a seamless user experience.
