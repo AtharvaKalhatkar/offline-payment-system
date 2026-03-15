@@ -1,2 +1,2 @@
-const BASE_URL = 'http://10.77.98.146:8082';
+const BASE_URL = 'https://offline-payment-system-production.up.railway.app';
 export default BASE_URL;
