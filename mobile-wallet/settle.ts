@@ -2,9 +2,7 @@
 // Automatically settles pending offline transactions when back online
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const BASE_URL = 'http://10.77.98.11:8082';
-
+import BASE_URL from './config';
 export interface PendingSettlement {
   id: string;
   tokenId: string;       // JWT nonce — used as tokenId on backend

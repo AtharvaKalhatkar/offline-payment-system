@@ -8,8 +8,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 
-const BASE_URL = 'http://10.77.98.11:8082';
-
+import BASE_URL from '../config';
 export default function SendQRScreen() {
   const router = useRouter();
   const [step, setStep] = useState<'amount' | 'pin' | 'qr'>('amount');

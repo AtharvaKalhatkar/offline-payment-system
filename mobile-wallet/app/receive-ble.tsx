@@ -8,8 +8,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { queueSettlement } from '../settle';
 
-const BASE_URL = 'http://10.77.98.11:8082';
-
+import BASE_URL from '../config';
 export default function ReceiveBLEScreen() {
   const router = useRouter();
   const [scanning, setScanning] = useState(false);

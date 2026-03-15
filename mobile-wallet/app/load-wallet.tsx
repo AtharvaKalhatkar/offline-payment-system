@@ -8,8 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-const BASE_URL = 'http://10.77.98.11:8082';
-
+import BASE_URL from '../config';
 export default function LoadWalletScreen() {
   const router = useRouter();
   const [step, setStep] = useState<'amount' | 'pin'>('amount');
