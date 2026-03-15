@@ -17,25 +17,39 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    // Method to register a new user
+    // Register a new user
     public User registerUser(String fullName, String phoneNumber, String pinHash) {
+        // Check if phone already registered
+        if (userRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            throw new RuntimeException("Phone number already registered!");
+        }
+
         User user = new User();
-        user.setId(UUID.randomUUID().toString()); // Generate a unique secure ID
+        user.setId(UUID.randomUUID().toString());
         user.setFullName(fullName);
         user.setPhoneNumber(phoneNumber);
         user.setPinHash(pinHash);
-        
-        // Let's give every new user ₹1000 for testing purposes!
-        user.setCloudBalance(new BigDecimal("1000.00")); 
-        
-        return userRepository.save(user); // Saves to PostgreSQL
+        user.setCloudBalance(new BigDecimal("1000.00"));
+
+        return userRepository.save(user);
     }
 
-    // Method to check balance
+    // Login with phone + PIN
+    public User loginUser(String phoneNumber, String pinHash) {
+        User user = userRepository.findByPhoneNumber(phoneNumber)
+            .orElseThrow(() -> new RuntimeException("No account found with this phone number!"));
+
+        if (!user.getPinHash().equals(pinHash)) {
+            throw new RuntimeException("Incorrect PIN!");
+        }
+
+        return user;
+    }
+
+    // Get balance
     public BigDecimal getBalance(String userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found in the database!"));
-            
+            .orElseThrow(() -> new RuntimeException("User not found!"));
         return user.getCloudBalance();
     }
 }

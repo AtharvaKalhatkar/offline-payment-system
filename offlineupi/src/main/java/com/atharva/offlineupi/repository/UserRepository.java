@@ -9,7 +9,5 @@ import com.atharva.offlineupi.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
-    
-    // Spring Boot magically writes the SQL for this just by reading the method name!
     Optional<User> findByPhoneNumber(String phoneNumber);
 }
